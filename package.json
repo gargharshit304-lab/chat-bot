@@ -1,0 +1,23 @@
+{
+  "name": "ai-chatbot-backend",
+  "version": "1.0.0",
+  "description": "Node.js + Express backend for AI chatbot",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "chat",
+    "ai",
+    "express",
+    "backend"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3"
+  }
+}
