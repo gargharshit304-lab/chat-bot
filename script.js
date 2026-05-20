@@ -7,7 +7,7 @@ const messages = [];
 
 const el = {
   chatsList: document.getElementById('chatsList'),
-  messages: document.getElementById('messages'),
+  messages: document.getElementById('messages-container'),
   emptyState: document.getElementById('empty-state'),
   inputForm: document.getElementById('inputForm'),
   input: document.getElementById('input'),
@@ -170,7 +170,6 @@ function removeTyping(ind){
 // Send message to backend
 async function sendMessage(text){
   // push user message immediately
-  syncEmptyState();
   pushMessage('user', text);
   el.input.value = '';
   autoResize(el.input);
@@ -255,7 +254,6 @@ el.newChat.addEventListener('click', ()=>{
   messages.length = 0;
   el.messages.innerHTML = '';
   el.chatsList.innerHTML = '<div class="empty">No previous chats — start a conversation</div>';
-  if(el.emptyState) el.messages.prepend(el.emptyState);
   syncEmptyState();
 });
 

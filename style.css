@@ -54,10 +54,12 @@ body{color:#eef4fb;background:#000;overscroll-behavior:none}
 .main-header h1{margin:0;font-size:18px}
 .status{color:var(--muted);font-size:13px}
 
-.messages{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;width:100%;padding:28px 48px 140px;border-radius:0;background:transparent;border:none;scroll-behavior:smooth;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:20px;overscroll-behavior:contain}
+.chat-area{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;width:100%}
 
-.messages #empty-state{display:flex;flex:1;min-height:0;align-items:center;justify-content:center;width:100%}
-.messages .empty-state{margin:auto}
+#empty-state{display:flex;flex:1;min-height:0;align-items:center;justify-content:center;width:100%}
+#empty-state[hidden]{display:none}
+
+.messages{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;width:100%;padding:28px 48px 140px;border-radius:0;background:transparent;border:none;scroll-behavior:smooth;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:20px;overscroll-behavior:contain}
 
 .empty-state{max-width:720px;text-align:center;color:#f3f6fb}
 .empty-icon{width:68px;height:68px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(90deg,var(--accent-from),var(--accent-to));box-shadow:0 12px 40px rgba(124,58,237,0.12);font-size:30px;margin-bottom:14px}
