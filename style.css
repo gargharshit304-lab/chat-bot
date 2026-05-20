@@ -56,6 +56,7 @@ body{color:#eef4fb;background:#000;overscroll-behavior:none}
 
 .messages{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;width:100%;padding:28px 48px 140px;border-radius:0;background:transparent;border:none;scroll-behavior:smooth;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:20px;overscroll-behavior:contain}
 
+.messages #empty-state{display:flex;flex:1;min-height:0;align-items:center;justify-content:center;width:100%}
 .messages .empty-state{margin:auto}
 
 .empty-state{max-width:720px;text-align:center;color:#f3f6fb}
