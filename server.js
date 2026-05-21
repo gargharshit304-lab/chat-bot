@@ -22,7 +22,7 @@ function generateAIResponse(userMessage) {
     'hello': 'Hey there! How can I help you today?',
     'hi': 'Hello! What can I do for you?',
     'how are you': 'I\'m doing great! Thanks for asking. How about you?',
-    'what is your name': 'I\'m your AI Assistant. Nice to meet you!',
+    'what is your name': 'I\'m ACE. Nice to meet you!',
     'thanks': 'You\'re welcome! Happy to help.',
     'thank you': 'My pleasure! Let me know if you need anything else.',
     'bye': 'Goodbye! Talk to you later.',
