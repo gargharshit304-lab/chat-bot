@@ -1,4 +1,5 @@
-import { Bot, Plus, ChevronLeft } from 'lucide-react';
+import { Plus, ChevronLeft } from 'lucide-react';
+import BrandMark from './BrandMark';
 
 export default function Sidebar({ open, onClose, onNewChat, quickActions }) {
   return (
@@ -9,15 +10,7 @@ export default function Sidebar({ open, onClose, onNewChat, quickActions }) {
       ].join(' ')}
     >
       <div className="mb-5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 shadow-glow">
-            <Bot className="h-5 w-5 text-white" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold tracking-wide text-white">AI Chat</p>
-            <p className="text-xs text-white/45">React • Vite • Tailwind</p>
-          </div>
-        </div>
+        <BrandMark />
 
         <button
           type="button"
@@ -63,8 +56,8 @@ export default function Sidebar({ open, onClose, onNewChat, quickActions }) {
       </div>
 
       <div className="mt-auto rounded-3xl border border-white/5 bg-gradient-to-b from-white/5 to-transparent p-4 text-xs text-white/45">
-        <p className="mb-1 font-medium text-white/70">Status</p>
-        <p>Pure black UI, viewport-locked layout, responsive sidebar.</p>
+        <p className="mb-1 font-medium text-white/70">ACE</p>
+        <p>Local AI Workspace for focused, private conversations.</p>
       </div>
     </aside>
   );

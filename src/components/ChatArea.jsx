@@ -22,7 +22,7 @@ export default function ChatArea({ messages, isTyping, messagesRef, bottomRef, o
                 </div>
               </div>
               <div className="rounded-3xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm text-white/55 shadow-glow">
-                Thinking...
+                ACE is thinking...
               </div>
             </div>
           ) : null}

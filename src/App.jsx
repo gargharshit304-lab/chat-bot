@@ -17,7 +17,7 @@ function createMessage(role, content, extra = {}) {
 
 export default function App() {
   const [messages, setMessages] = useState([]);
-  const [status, setStatus] = useState('Ready');
+  const [status, setStatus] = useState('ACE ready');
   const [isTyping, setIsTyping] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const bottomRef = useRef(null);
@@ -31,7 +31,7 @@ export default function App() {
 
   const onNewChat = () => {
     setMessages([]);
-    setStatus('Ready');
+    setStatus('ACE ready');
     setIsTyping(false);
     messagesRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -42,7 +42,7 @@ export default function App() {
 
     const userMessage = createMessage('user', trimmed);
     setMessages((current) => [...current, userMessage]);
-    setStatus('AI is typing...');
+    setStatus('ACE is thinking...');
     setIsTyping(true);
 
     try {
@@ -65,13 +65,13 @@ export default function App() {
         ...current,
         createMessage('assistant', reply)
       ]);
-      setStatus('Ready');
+      setStatus('ACE ready');
     } catch (error) {
       setMessages((current) => [
         ...current,
         createMessage('assistant', 'Error: Could not reach the server.')
       ]);
-      setStatus('Connection error');
+      setStatus('ACE connection error');
       console.error(error);
     } finally {
       setIsTyping(false);
