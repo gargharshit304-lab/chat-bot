@@ -12,21 +12,6 @@ export default function ChatArea({ messages, isTyping, messagesRef, bottomRef, o
             <MessageBubble key={message.id} message={message} />
           ))}
 
-          {isTyping ? (
-            <div className="flex w-full gap-3 animate-fadeUp">
-              <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white shadow-glow">
-                <div className="flex items-center gap-1">
-                  <span className="h-1.5 w-1.5 animate-pulseDots rounded-full bg-white/60" />
-                  <span className="h-1.5 w-1.5 animate-pulseDots rounded-full bg-white/60 [animation-delay:150ms]" />
-                  <span className="h-1.5 w-1.5 animate-pulseDots rounded-full bg-white/60 [animation-delay:300ms]" />
-                </div>
-              </div>
-              <div className="rounded-3xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm text-white/55 shadow-glow">
-                ACE is thinking...
-              </div>
-            </div>
-          ) : null}
-
           <div ref={bottomRef} />
         </div>
       </div>

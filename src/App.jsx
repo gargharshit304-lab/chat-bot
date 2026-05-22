@@ -135,7 +135,7 @@ export default function App() {
 
     const userMessage = createMessage('user', trimmed);
     const assistantId = `assistant-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-    setMessages((current) => [...current, userMessage, createMessage('assistant', '', { id: assistantId })]);
+    setMessages((current) => [...current, userMessage, createMessage('assistant', 'ACE is thinking...', { id: assistantId })]);
     setStatus(`Generating with ${selectedModel}`);
     setIsTyping(true);
 
@@ -183,6 +183,9 @@ export default function App() {
           }
 
           if (parsed.response) {
+            if (!accumulated) {
+              updateAssistantMessage(assistantId, '');
+            }
             accumulated += parsed.response;
             updateAssistantMessage(assistantId, accumulated);
           }
