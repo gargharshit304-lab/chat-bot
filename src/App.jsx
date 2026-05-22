@@ -218,12 +218,6 @@ export default function App() {
           open={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
           onNewChat={onNewChat}
-          quickActions={quickActions}
-          models={models}
-          selectedModel={selectedModel}
-          onSelectModel={setSelectedModel}
-          ollamaConnected={ollamaConnected}
-          ollamaMessage={ollamaMessage}
         />
 
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden border-l border-white/5 bg-[#000000]">
@@ -243,7 +237,14 @@ export default function App() {
             onNewChat={onNewChat}
           />
 
-          <ChatInput onSend={sendMessage} disabled={isTyping || !selectedModel} />
+          <ChatInput
+            onSend={sendMessage}
+            disabled={isTyping || !selectedModel}
+            models={models}
+            selectedModel={selectedModel}
+            onSelectModel={setSelectedModel}
+            ollamaConnected={ollamaConnected}
+          />
         </main>
       </div>
     </div>
