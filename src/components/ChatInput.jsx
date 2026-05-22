@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { SendHorizontal } from 'lucide-react';
 
-export default function ChatInput({ onSend }) {
+export default function ChatInput({ onSend, disabled }) {
   const [value, setValue] = useState('');
 
   const submit = (event) => {
     event.preventDefault();
+    if (disabled) {
+      return;
+    }
     const nextValue = value.trim();
     if (!nextValue) return;
     onSend(nextValue);
@@ -28,11 +31,13 @@ export default function ChatInput({ onSend }) {
           onChange={(event) => setValue(event.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Message the assistant..."
+          disabled={disabled}
           className="max-h-40 min-h-[52px] flex-1 resize-none bg-transparent px-2 py-3 text-sm leading-6 text-white placeholder:text-white/35 focus:outline-none sm:text-[15px]"
         />
 
         <button
           type="submit"
+          disabled={disabled}
           className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-black transition hover:scale-[1.02] hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
           aria-label="Send message"
         >

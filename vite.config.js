@@ -6,7 +6,8 @@ module.exports = defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/chat': 'http://localhost:3000'
+      '/api': 'http://localhost:3000',
+      '/health': 'http://localhost:3000'
     }
   }
 });

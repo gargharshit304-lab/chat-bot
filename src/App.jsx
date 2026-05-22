@@ -20,12 +20,74 @@ export default function App() {
   const [status, setStatus] = useState('ACE ready');
   const [isTyping, setIsTyping] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [ollamaConnected, setOllamaConnected] = useState(false);
+  const [ollamaMessage, setOllamaMessage] = useState('Checking local models...');
+  const [models, setModels] = useState([]);
+  const [selectedModel, setSelectedModel] = useState(() => window.localStorage.getItem('ace.selectedModel') || '');
   const bottomRef = useRef(null);
   const messagesRef = useRef(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
+
+  useEffect(() => {
+    if (selectedModel) {
+      window.localStorage.setItem('ace.selectedModel', selectedModel);
+    }
+  }, [selectedModel]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadModels = async () => {
+      try {
+        const response = await fetch('/api/ollama/models');
+        const data = await response.json();
+
+        if (cancelled) {
+          return;
+        }
+
+        const nextModels = Array.isArray(data.models) ? data.models : [];
+        setModels(nextModels);
+        setOllamaConnected(Boolean(data.connected));
+        setOllamaMessage(data.connected ? `Connected to ${data.baseUrl || 'Ollama'}` : 'Ollama is not running');
+
+        if (nextModels.length > 0) {
+          setSelectedModel((current) => {
+            if (current && nextModels.some((model) => model.name === current)) {
+              return current;
+            }
+
+            const storedModel = window.localStorage.getItem('ace.selectedModel');
+            if (storedModel && nextModels.some((model) => model.name === storedModel)) {
+              return storedModel;
+            }
+
+            return nextModels[0].name;
+          });
+        }
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        setModels([]);
+        setOllamaConnected(false);
+        setOllamaMessage('Unable to reach Ollama');
+        console.error(error);
+      }
+    };
+
+    loadModels();
+    const interval = window.setInterval(loadModels, 10000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, []);
 
   const hasMessages = messages.length > 0;
 
@@ -36,41 +98,106 @@ export default function App() {
     messagesRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const updateAssistantMessage = (messageId, content) => {
+    setMessages((current) => current.map((message) => (
+      message.id === messageId
+        ? { ...message, content }
+        : message
+    )));
+  };
+
+  const parseStreamChunk = (chunk) => {
+    const trimmed = chunk.trim();
+    if (!trimmed || trimmed === '[DONE]') {
+      return null;
+    }
+
+    const payload = trimmed.startsWith('data:') ? trimmed.slice(5).trim() : trimmed;
+    if (!payload) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(payload);
+    } catch {
+      return null;
+    }
+  };
+
   const sendMessage = async (text) => {
     const trimmed = text.trim();
-    if (!trimmed) return;
+    if (!trimmed || isTyping) return;
+
+    if (!selectedModel) {
+      setStatus('Select a local model first');
+      return;
+    }
 
     const userMessage = createMessage('user', trimmed);
-    setMessages((current) => [...current, userMessage]);
-    setStatus('ACE is thinking...');
+    const assistantId = `assistant-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    setMessages((current) => [...current, userMessage, createMessage('assistant', '', { id: assistantId })]);
+    setStatus(`Generating with ${selectedModel}`);
     setIsTyping(true);
 
     try {
-      const response = await fetch('/chat', {
+      const response = await fetch('/api/ollama/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ message: trimmed })
+        body: JSON.stringify({
+          model: selectedModel,
+          prompt: trimmed,
+          stream: true
+        })
       });
 
       if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
+        const details = await response.text();
+        throw new Error(details || `Request failed with status ${response.status}`);
       }
 
-      const data = await response.json();
-      const reply = data.reply || 'Sorry, I could not generate a response.';
+      if (!response.body) {
+        throw new Error('Streaming response is not available');
+      }
 
-      setMessages((current) => [
-        ...current,
-        createMessage('assistant', reply)
-      ]);
-      setStatus('ACE ready');
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let accumulated = '';
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) {
+          break;
+        }
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          const parsed = parseStreamChunk(line);
+          if (!parsed) {
+            continue;
+          }
+
+          if (parsed.response) {
+            accumulated += parsed.response;
+            updateAssistantMessage(assistantId, accumulated);
+          }
+        }
+      }
+
+      const finalChunk = parseStreamChunk(buffer);
+      if (finalChunk?.response) {
+        accumulated += finalChunk.response;
+      }
+
+      updateAssistantMessage(assistantId, accumulated || 'No response received from Ollama.');
+      setStatus(`${selectedModel} ready`);
     } catch (error) {
-      setMessages((current) => [
-        ...current,
-        createMessage('assistant', 'Error: Could not reach the server.')
-      ]);
+      updateAssistantMessage(assistantId, `Error: ${error.message}`);
       setStatus('ACE connection error');
       console.error(error);
     } finally {
@@ -92,12 +219,19 @@ export default function App() {
           onClose={() => setSidebarOpen(false)}
           onNewChat={onNewChat}
           quickActions={quickActions}
+          models={models}
+          selectedModel={selectedModel}
+          onSelectModel={setSelectedModel}
+          ollamaConnected={ollamaConnected}
+          ollamaMessage={ollamaMessage}
         />
 
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden border-l border-white/5 bg-[#000000]">
           <Header
             status={status}
             hasMessages={hasMessages}
+            selectedModel={selectedModel}
+            ollamaConnected={ollamaConnected}
             onToggleSidebar={() => setSidebarOpen((value) => !value)}
           />
 
@@ -109,7 +243,7 @@ export default function App() {
             onNewChat={onNewChat}
           />
 
-          <ChatInput onSend={sendMessage} />
+          <ChatInput onSend={sendMessage} disabled={isTyping || !selectedModel} />
         </main>
       </div>
     </div>

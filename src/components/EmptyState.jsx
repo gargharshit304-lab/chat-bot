@@ -8,9 +8,9 @@ export default function EmptyState({ onNewChat }) {
         <div className="mx-auto mb-6 flex justify-center">
           <BrandMark centered />
         </div>
-        <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-5xl">ACE is ready</h2>
+        <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-5xl">ACE is ready for local models</h2>
         <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-white/55 sm:text-base">
-          Your Local AI Workspace is ready. Send a message to begin a focused chat and the empty state will disappear.
+          Connect Ollama, pick a model from the sidebar, and start a private chat that streams responses as they generate.
         </p>
         <button
           type="button"
