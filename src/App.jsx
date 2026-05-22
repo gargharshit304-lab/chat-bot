@@ -195,6 +195,39 @@ export default function App() {
     messagesRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const renameChat = (chatId, nextTitle) => {
+    const trimmedTitle = nextTitle.trim();
+    if (!trimmedTitle) {
+      return;
+    }
+
+    setChats((currentChats) => currentChats.map((chat) => (
+      chat.id === chatId
+        ? { ...chat, title: trimmedTitle.slice(0, 64), updatedAt: Date.now() }
+        : chat
+    )));
+  };
+
+  const deleteChat = (chatId) => {
+    setChats((currentChats) => {
+      if (currentChats.length <= 1) {
+        const fallbackChat = createChat('New Chat', resolvedModel);
+        setActiveChatId(fallbackChat.id);
+        setStatus('ACE ready');
+        return [fallbackChat];
+      }
+
+      const nextChats = currentChats.filter((chat) => chat.id !== chatId);
+      if (activeChatId === chatId) {
+        setActiveChatId(nextChats[0]?.id || crypto.randomUUID());
+      }
+
+      return nextChats;
+    });
+
+    setIsTyping(false);
+  };
+
   const switchChat = (chatId) => {
     const nextChat = chats.find((chat) => chat.id === chatId);
     setActiveChatId(chatId);
@@ -371,6 +404,8 @@ export default function App() {
           chats={chats}
           activeChatId={activeChatId}
           onSelectChat={switchChat}
+          onRenameChat={renameChat}
+          onDeleteChat={deleteChat}
         />
 
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden border-l border-white/5 bg-[#000000]">
