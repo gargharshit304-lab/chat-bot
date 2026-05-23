@@ -8,6 +8,7 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
+const OLLAMA_CHAT_TIMEOUT_MS = Number(process.env.OLLAMA_CHAT_TIMEOUT_MS || 180000);
 const distPath = path.join(__dirname, 'dist');
 const hasBuiltFrontend = fs.existsSync(distPath);
 
@@ -146,7 +147,7 @@ async function proxyOllamaChat(req, res) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(chatPayload)
-    }, 30000);
+    }, OLLAMA_CHAT_TIMEOUT_MS);
 
     if (ollamaResponse.status === 404) {
       const prompt = messagesToPrompt(messages);
@@ -160,7 +161,7 @@ async function proxyOllamaChat(req, res) {
           prompt,
           stream: stream !== false
         })
-      }, 30000);
+      }, OLLAMA_CHAT_TIMEOUT_MS);
     }
 
     if (!ollamaResponse.ok) {
@@ -186,6 +187,13 @@ async function proxyOllamaChat(req, res) {
 
     Readable.fromWeb(ollamaResponse.body).pipe(res);
   } catch (error) {
+    if (error?.name === 'AbortError') {
+      return res.status(504).json({
+        error: 'Ollama request timed out',
+        details: 'The selected model may still be loading. Try again in a moment or keep the model running in Ollama.'
+      });
+    }
+
     console.error('Error in /api/chat:', error);
     res.status(500).json({ error: 'Internal server error', details: error.message });
   }

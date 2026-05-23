@@ -386,8 +386,12 @@ export default function App() {
       updateAssistantMessage(assistantId, accumulated || 'No response received from Ollama.');
       setStatus(`${resolvedModel} ready`);
     } catch (error) {
-      updateAssistantMessage(assistantId, `Error: ${error.message}`);
-      setStatus('ACE connection error');
+      const message = error.message.includes('timed out')
+        ? 'The selected model is still loading. Try again in a moment.'
+        : error.message;
+
+      updateAssistantMessage(assistantId, `Error: ${message}`);
+      setStatus(message.includes('loading') ? 'Model loading' : 'ACE connection error');
       console.error(error);
     } finally {
       setIsTyping(false);
